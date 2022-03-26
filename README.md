@@ -2,6 +2,8 @@
 
 A simple example of using bgfx in SDL2 that actually draws something.
 
+![MREGA](bgfx-SDL2.png)
+
 Derived from the following:
 
 https://stackoverflow.com/questions/55487168/having-trouble-initializing-bgfx-with-an-sdl2-window
