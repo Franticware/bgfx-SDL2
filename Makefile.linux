@@ -1,0 +1,11 @@
+all:
+	g++ main.cpp -o bgfx-SDL2 -fno-exceptions -fPIC -std=c++20 -Ibx/include -Ibgfx/include -Ibimg/include -DBX_CONFIG_DEBUG=0 -s \
+-lGL -lX11 -lSDL2 \
+       bgfx/.build/linux64_gcc/bin/libbgfxRelease.a \
+       bgfx/.build/linux64_gcc/bin/libbimgRelease.a \
+         bgfx/.build/linux64_gcc/bin/libbxRelease.a \
+bgfx/.build/linux64_gcc/bin/libbimg_encodeRelease.a \
+bgfx/.build/linux64_gcc/bin/libbimg_decodeRelease.a
+
+clean:
+	rm -f bgfx-SDL2
