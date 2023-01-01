@@ -26,6 +26,14 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 //#include <bx/handlealloc.h>
 #include <bx/readerwriter.h>
 
+#include <glm/vec3.hpp> // glm::vec3
+#include <glm/vec4.hpp> // glm::vec4
+#include <glm/mat4x4.hpp> // glm::mat4
+#include <glm/ext/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale
+#include <glm/ext/matrix_clip_space.hpp> // glm::perspective
+#include <glm/ext/scalar_constants.hpp> // glm::pi
+#include <glm/gtc/type_ptr.hpp> // glm::value_ptr
+
 struct PosColorVertex
 {
     float m_x;
@@ -400,12 +408,13 @@ public:
 
         // Set view and projection matrix for view 0.
         {
-            float view[16];
-            bx::mtxLookAt(view, eye, at);
+            glm::mat4 view = glm::mat4(1);
+            view = glm::rotate(view, glm::radians(180.f), glm::vec3(0, 1, 0));
+            view = glm::translate(view, glm::vec3(0, 0, 35.f));
 
-            float proj[16];
-            bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
-            bgfx::setViewTransform(0, view, proj);
+            glm::mat4 proj = glm::perspective(glm::radians(60.f), float(m_width)/float(m_height), 0.1f, 100.f);
+
+            bgfx::setViewTransform(0, glm::value_ptr(view), glm::value_ptr(proj));
 
             // Set view 0 default viewport.
             bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height) );
@@ -423,7 +432,7 @@ public:
             | (m_a ? BGFX_STATE_WRITE_A : 0)
             | BGFX_STATE_WRITE_Z
             | BGFX_STATE_DEPTH_TEST_LESS
-            | BGFX_STATE_CULL_CW
+            | BGFX_STATE_CULL_CCW
             | BGFX_STATE_MSAA
             | s_ptState[m_pt]
             ;
@@ -433,14 +442,13 @@ public:
         {
             for (uint32_t xx = 0; xx < 11; ++xx)
             {
-                float mtx[16];
-                bx::mtxRotateXY(mtx, time + xx*0.21f, time + yy*0.37f);
-                mtx[12] = -15.0f + float(xx)*3.0f;
-                mtx[13] = -15.0f + float(yy)*3.0f;
-                mtx[14] = 0.0f;
+                glm::mat4 mtx(1);
+                mtx = glm::translate(mtx, glm::vec3(-15.0f + float(xx)*3.0f, -15.0f + float(yy)*3.0f, 0.f));
+                mtx = glm::rotate(mtx, (time + yy*0.37f), glm::vec3(0, -1, 0));
+                mtx = glm::rotate(mtx, (time + xx*0.21f), glm::vec3(-1, 0, 0));
 
                 // Set model matrix for rendering.
-                bgfx::setTransform(mtx);
+                bgfx::setTransform(glm::value_ptr(mtx));
 
                 // Set vertex and index buffer.
                 bgfx::setVertexBuffer(0, m_vbh);
